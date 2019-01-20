@@ -3,9 +3,11 @@ package controllers
 import javax.inject._
 import play.api.cache.redis.CacheAsyncApi
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
+
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
-
+import model.serverdto.Host
+import play.api.libs.json._
 /**
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
@@ -25,11 +27,9 @@ class HomeController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi)(i
   }
 
 
-  private def message = cache.getOrElse("hello-world#message", expiration = 10.seconds) {
-    "This is a sample message."
-  }
+  private def message = cache.get[Host]("Host#DEV")
 
   def getMessage = Action.async {
-    message.map(msg => Ok(msg))
+    message.map(msg => Ok(Json.toJson(msg)))
   }
 }

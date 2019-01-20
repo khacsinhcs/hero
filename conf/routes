@@ -1,4 +1,10 @@
 GET     /                           controllers.HomeController.index
 GET     /getMessage                 controllers.HomeController.getMessage
 
+GET 	/api/host/:name				controllers.HostController.getHost(name: String)
+POST	/api/host					controllers.HostController.createHost
+PUT		/api/host/:name				controllers.HostController.updateHost(name: String)
+DELETE	/api/host/:name				controllers.HostController.deleteHost(name: String)
+GET		/api/hosts					controllers.HostController.getAllHosts
+
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
