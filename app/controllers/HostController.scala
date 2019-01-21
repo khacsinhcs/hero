@@ -1,5 +1,6 @@
 package controllers
 
+import akka.actor.ActorSystem
 import javax.inject.Inject
 import play.api.cache.redis.CacheAsyncApi
 import play.api.libs.json._
@@ -8,8 +9,10 @@ import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Reque
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
+class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, system: ActorSystem)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
+
   import model.HostConfig._
+
   def getHost(name: String) = Action.async {
     cache.get[Host]("Host#" + name).map(host => Ok(Json.toJson(host)))
   }
@@ -30,6 +33,7 @@ class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi)(i
       }
     }
   }
+
   def updateHost(name: String) = ???
 
   def deleteHost(name: String) = ???
