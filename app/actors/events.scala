@@ -4,7 +4,7 @@ object events {
 
   case class CreateEvent[Type](t: Type)
 
-  case class UpdateEvent[Type](t: Type)
+  case class UpdateEvent[Key, Type](key: Key, t: Type)
 
   case class DeleteEvent[Key](key: Key)
 
