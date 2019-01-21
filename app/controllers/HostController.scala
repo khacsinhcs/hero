@@ -1,6 +1,7 @@
 package controllers
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
+import com.google.inject.name.Named
 import javax.inject.Inject
 import play.api.cache.redis.CacheAsyncApi
 import play.api.libs.json._
@@ -9,7 +10,7 @@ import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Reque
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, system: ActorSystem)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
+class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, @Named("hostActor") hostActor: ActorRef)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
 
   import model.HostConfig._
 

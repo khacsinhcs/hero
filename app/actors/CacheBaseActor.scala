@@ -6,7 +6,6 @@ import model.HostConfig.Host
 import play.api.cache.redis.CacheAsyncApi
 
 import scala.concurrent.ExecutionContext
-import scala.util.Try
 
 trait CacheBaseActor[Key, Type] extends Actor {
   val cache: CacheAsyncApi
@@ -14,7 +13,7 @@ trait CacheBaseActor[Key, Type] extends Actor {
   implicit val executionContext: ExecutionContext
 
   import scala.concurrent.duration._
-  import scala.util.{Success, Failure}
+  import scala.util.Success
 
   override def receive: Receive = {
 
