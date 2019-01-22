@@ -6,13 +6,12 @@ import akka.actor.ActorSystem
 import com.google.inject.{Inject, Singleton}
 import model.HostConfig._
 import model.serverdto._
-import play.api.cache.redis.CacheAsyncApi
+import play.api.cache.redis.CacheApi
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
 
 @Singleton
-class InitData @Inject()(cache: CacheAsyncApi, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) {
+class InitData @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) {
 
   object Database {
     val hosts = List(Host("DEV", "", "", ""), Host("DEV2", "", "", ""))

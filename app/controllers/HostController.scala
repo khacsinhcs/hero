@@ -4,13 +4,13 @@ import actors.HostActor
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import javax.inject.Inject
-import play.api.cache.redis.CacheAsyncApi
+import play.api.cache.redis.CacheApi
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
+class HostController @Inject()(cc: ControllerComponents, cache: CacheApi, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
 
   import actors.events._
   import akka.pattern.ask

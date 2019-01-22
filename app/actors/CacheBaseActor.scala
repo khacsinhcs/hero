@@ -2,18 +2,17 @@ package actors
 
 import actors.events._
 import akka.actor.Actor
-import play.api.cache.redis.CacheAsyncApi
+import play.api.cache.redis.CacheApi
 
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
 
-abstract class CacheBaseActor[Key : ClassTag, Type <: Sendable : ClassTag] extends Actor {
-  val cache: CacheAsyncApi
+abstract class CacheBaseActor[Key: ClassTag, Type <: Sendable : ClassTag] extends Actor {
+  val cache: CacheApi
 
   implicit val executionContext: ExecutionContext
 
   import scala.concurrent.duration._
-  import scala.util.Success
 
   override def receive: Receive = {
 
@@ -22,29 +21,24 @@ abstract class CacheBaseActor[Key : ClassTag, Type <: Sendable : ClassTag] exten
       cache set(keyCode(keyName), t, 1000 minutes)
       cache set[String] s"Type($typeName)" add keyCode(keyName)
     case UpdateEvent(keyName: Key, data: Type) =>
-      cache.get[Type](keyCode(keyName)).foreach {
-        case Some(_) => cache.set(keyCode(keyName), data)
-      }
-    case DeleteEvent(keyName: Key) =>
-      cache get[Type] keyCode(keyName) map {
+      val oldValue = cache get[Type] keyCode(keyName)
+      val isSuccess = oldValue match {
         case Some(_) =>
-          cache.remove(keyCode(keyName))
-          cache.set[String](s"Type($typeName)").remove(keyCode(keyName))
-      } onComplete {
-        case Success(_) => sender() ! true
+          cache set(keyCode(keyName), data, 1000 minutes)
+          true
+        case None => false
       }
+      sender ! isSuccess
+    case DeleteEvent(keyName: Key) =>
+      val success = cache get[Type] keyCode(keyName)
+      cache.remove(keyCode(keyName))
+      cache.set[String](s"Type($typeName)").remove(keyCode(keyName))
+      sender ! success
     case GetAll =>
-      cache get[Set[Type]] s"Type($typeName)" map {
-        case Some(s) => s
-        case None => Set()
-      } onComplete {
-        case Success(value) => sender() ! value
-      }
+      sender ! (cache get[Set[Type]] s"Type($typeName)")
 
     case Get(keyName: Key) =>
-      val get = cache get[Option[Type]] keyCode(keyName)
-      val result = Await.result(get, 5 seconds)
-      sender ! result
+      sender ! (cache get[Option[Type]] keyCode(keyName))
   }
 
   protected def keyCode(keyName: Key): String = {
