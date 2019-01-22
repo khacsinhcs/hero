@@ -1,19 +1,17 @@
 package model
 
 object HostConfig {
-  case class Host(name: String, gateway: String, web: String, mls: String)
+  case class Host(name: String, gateway: String, web: String, mls: String) extends Serializable
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
-  implicit val hostWrite = new Writes[Host] {
-    override def writes(o: Host): JsValue = Json.obj(
-      "name" -> o.name,
-      "gateway" -> o.gateway,
-      "web" -> o.web,
-      "mls" -> o.mls
-    )
-  }
+  implicit val hostWrite: Writes[Host] = (host: Host) => Json.obj(
+    "name" -> host.name,
+    "gateway" -> host.gateway,
+    "web" -> host.web,
+    "mls" -> host.mls
+  )
 
   implicit val hostRead: Reads[Host] = (
     (JsPath \ "name").read[String] and
