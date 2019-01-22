@@ -47,7 +47,7 @@ abstract class CacheBaseActor[Key : ClassTag, Type <: Sendable : ClassTag] exten
       sender ! result
   }
 
-  protected def keyCode(keyName: Key) = {
+  protected def keyCode(keyName: Key): String = {
     typeName + "(" + keyName + ")"
   }
 
