@@ -8,9 +8,8 @@ import play.api.cache.redis.CacheAsyncApi
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
-
 class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
 
   import actors.events._

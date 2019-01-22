@@ -4,10 +4,10 @@ import actors.events._
 import akka.actor.Actor
 import play.api.cache.redis.CacheAsyncApi
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Await, ExecutionContext}
 import scala.reflect.ClassTag
 
-trait CacheBaseActor[Key, Type <: Sendable] extends Actor {
+abstract class CacheBaseActor[Key : ClassTag, Type <: Sendable : ClassTag] extends Actor {
   val cache: CacheAsyncApi
 
   implicit val executionContext: ExecutionContext
@@ -22,11 +22,11 @@ trait CacheBaseActor[Key, Type <: Sendable] extends Actor {
       cache set(keyCode(keyName), t, 1000 minutes)
       cache set[String] s"Type($typeName)" add keyCode(keyName)
     case UpdateEvent(keyName: Key, data: Type) =>
-      cache.get[ClassTag[Type]](keyCode(keyName)).foreach {
+      cache.get[Type](keyCode(keyName)).foreach {
         case Some(_) => cache.set(keyCode(keyName), data)
       }
     case DeleteEvent(keyName: Key) =>
-      cache get[ClassTag[Type]] keyCode(keyName) map {
+      cache get[Type] keyCode(keyName) map {
         case Some(_) =>
           cache.remove(keyCode(keyName))
           cache.set[String](s"Type($typeName)").remove(keyCode(keyName))
@@ -34,7 +34,7 @@ trait CacheBaseActor[Key, Type <: Sendable] extends Actor {
         case Success(_) => sender() ! true
       }
     case GetAll =>
-      cache get[Set[ClassTag[Type]]] s"Type($typeName)" map {
+      cache get[Set[Type]] s"Type($typeName)" map {
         case Some(s) => s
         case None => Set()
       } onComplete {
@@ -42,10 +42,9 @@ trait CacheBaseActor[Key, Type <: Sendable] extends Actor {
       }
 
     case Get(keyName: Key) =>
-      cache get[ClassTag[Type]] keyCode(keyName) onComplete {
-        case Success(Some(t)) => sender() ! Some(t)
-        case _ => sender() ! None
-      }
+      val get = cache get[Option[Type]] keyCode(keyName)
+      val result = Await.result(get, 5 seconds)
+      sender ! result
   }
 
   protected def keyCode(keyName: Key) = {
