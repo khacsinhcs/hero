@@ -6,7 +6,7 @@ import akka.util.Timeout
 import javax.inject.Inject
 import play.api.cache.redis.CacheAsyncApi
 import play.api.libs.json._
-import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
+import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -17,11 +17,11 @@ class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, a
   import akka.pattern.ask
   import model.HostConfig._
 
-  implicit val timeout = Timeout(5 seconds)
+  implicit val timeout: Timeout = Timeout(5 seconds)
 
   val hostActor: ActorRef = actorSystem.actorOf(HostActor.prop(executionContext, cache))
 
-  def getHost(name: String) = Action.async {
+  def getHost(name: String): Action[AnyContent] = Action.async {
     ask(hostActor, Get(name)).mapTo[Host].map(host => Ok(Json.toJson(host)))
   }
 
@@ -38,13 +38,13 @@ class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, a
     }
   }
 
-  def updateHost(name: String) = Action { _: Request[AnyContent] => Ok("Todo") }
+  def updateHost(name: String): Action[AnyContent] = Action { _: Request[AnyContent] => Ok("Todo") }
 
-  def deleteHost(name: String) = Action.async { _: Request[AnyContent] =>
+  def deleteHost(name: String): Action[AnyContent] = Action.async { _: Request[AnyContent] =>
     ask(hostActor, DeleteEvent(name)).map(_ => Ok)
   }
 
-  def getAllHosts = Action.async { _: Request[AnyContent] =>
+  def getAllHosts: Action[AnyContent] = Action.async { _: Request[AnyContent] =>
     ask(hostActor, GetAll[Host]()).mapTo[Seq[Host]].map(hosts => Ok(Json.toJson(hosts)))
   }
 }
