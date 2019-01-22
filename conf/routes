@@ -1,5 +1,4 @@
 GET     /                           controllers.HomeController.index
-GET     /getMessage                 controllers.HomeController.getMessage
 
 GET 	/api/host/:name				controllers.HostController.getHost(name: String)
 POST	/api/host					controllers.HostController.createHost

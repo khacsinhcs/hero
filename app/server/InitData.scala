@@ -5,6 +5,7 @@ import play.api.cache.redis.CacheApi
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
+import model.HostConfig._
 import model.serverdto._
 
 @Singleton

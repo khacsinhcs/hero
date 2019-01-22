@@ -1,30 +1,32 @@
 package controllers
 
+import actors.HostActor
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import com.google.inject.name.Named
 import javax.inject.Inject
 import play.api.cache.redis.CacheAsyncApi
 import play.api.libs.json._
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
 
-class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, @Named("hostActor") hostActor: ActorRef)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
+class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
 
-  import model.HostConfig._
   import actors.events._
-  import akka.pattern.{ask}
+  import akka.pattern.ask
+  import model.HostConfig._
 
   implicit val timeout = Timeout(5 seconds)
+
+  val hostActor: ActorRef = actorSystem.actorOf(HostActor.prop(executionContext, cache))
 
   def getHost(name: String) = Action.async {
     ask(hostActor, Get(name)).mapTo[Host].map(host => Ok(Json.toJson(host)))
   }
 
   def createHost = Action { request: Request[AnyContent] =>
-    request.body.asJson.map { json =>
+    request.body.asJson map { json =>
       json.validate[Host] asOpt match {
         case Some(host) =>
           hostActor ! CreateEvent(host)
@@ -36,9 +38,13 @@ class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, @
     }
   }
 
-  def updateHost(name: String) = ???
+  def updateHost(name: String) = Action { _: Request[AnyContent] => Ok("Todo") }
 
-  def deleteHost(name: String) = ???
+  def deleteHost(name: String) = Action.async { _: Request[AnyContent] =>
+    ask(hostActor, DeleteEvent(name)).map(_ => Ok)
+  }
 
-  def getAllHosts = ???
+  def getAllHosts = Action.async { _: Request[AnyContent] =>
+    ask(hostActor, GetAll[Host]()).mapTo[Seq[Host]].map(hosts => Ok(Json.toJson(hosts)))
+  }
 }
