@@ -15,9 +15,6 @@ import scala.concurrent.ExecutionContext
  */
 class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
   "HomeController GET" should {
-
-
-
     "render the index page from the application" in {
       val controller = inject[HomeController]
       val home = controller.index().apply(FakeRequest(GET, "/"))
