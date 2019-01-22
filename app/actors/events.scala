@@ -10,4 +10,6 @@ object events {
 
   case class GetAll[Type]()
 
+  case class Get[Key](key: Key)
+
 }

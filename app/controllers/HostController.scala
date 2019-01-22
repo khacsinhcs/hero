@@ -1,6 +1,7 @@
 package controllers
 
 import akka.actor.{ActorRef, ActorSystem}
+import akka.util.Timeout
 import com.google.inject.name.Named
 import javax.inject.Inject
 import play.api.cache.redis.CacheAsyncApi
@@ -13,25 +14,25 @@ import scala.concurrent.{ExecutionContext, Future}
 class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, @Named("hostActor") hostActor: ActorRef)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
 
   import model.HostConfig._
+  import actors.events._
+  import akka.pattern.{ask}
+
+  implicit val timeout = Timeout(5 seconds)
 
   def getHost(name: String) = Action.async {
-    cache.get[Host]("Host#" + name).map(host => Ok(Json.toJson(host)))
+    ask(hostActor, Get(name)).mapTo[Host].map(host => Ok(Json.toJson(host)))
   }
 
-  def createHost = Action.async { request: Request[AnyContent] =>
+  def createHost = Action { request: Request[AnyContent] =>
     request.body.asJson.map { json =>
       json.validate[Host] asOpt match {
         case Some(host) =>
-          cache.list[String]("HostKey") += "hello me"
-          cache.set(host.name, host, 10.hours).map(_ => Ok())
-        case None => Future {
-          BadRequest
-        }
+          hostActor ! CreateEvent(host)
+          Ok("")
+        case None => BadRequest
       }
-    }.getOrElse {
-      Future {
-        BadRequest("Expecting application/json request body")
-      }
+    } getOrElse {
+      BadRequest("Expecting application/json request body")
     }
   }
 

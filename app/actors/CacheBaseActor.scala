@@ -40,6 +40,11 @@ trait CacheBaseActor[Key, Type] extends Actor {
       } onComplete {
         case Success(value) => sender() ! value
       }
+
+    case Get(keyName: Key) =>
+      cache.get[Type](keyCode(keyName)).onComplete {
+        case Success(value) => sender() ! value
+      }
   }
 
   private def keyCode(keyName: Key) = {
