@@ -8,7 +8,7 @@ import play.api.cache.redis.CacheAsyncApi
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
@@ -22,9 +22,9 @@ class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, a
   val hostActor: ActorRef = actorSystem.actorOf(HostActor.prop(executionContext, cache))
 
   def getHost(name: String): Action[AnyContent] = Action.async {
-    ask(hostActor, Get(name)) foreach (msg => println(msg))
-    Future {
-      Ok
+    ask(hostActor, Get(name)).mapTo[Option[Host]].map{
+      case Some(host) => Ok(Json.toJson(host))
+      case None => NotFound
     }
   }
 
