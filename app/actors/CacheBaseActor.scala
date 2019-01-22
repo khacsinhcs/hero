@@ -19,8 +19,8 @@ trait CacheBaseActor[Key, Type <: Sendable] extends Actor {
 
     case CreateEvent(t: Type) =>
       val keyName: Key = keyOf(t)
-      cache.set(keyCode(keyName), t, 1000.minutes)
-      cache.set[String](s"Type($typeName)") add keyCode(keyName)
+      cache set(keyCode(keyName), t, 1000 minutes)
+      cache set[String] s"Type($typeName)" add keyCode(keyName)
     case UpdateEvent(keyName: Key, data: Type) =>
       cache.get[ClassTag[Type]](keyCode(keyName)).foreach {
         case Some(_) => cache.set(keyCode(keyName), data)
@@ -34,7 +34,7 @@ trait CacheBaseActor[Key, Type <: Sendable] extends Actor {
         case Success(_) => sender() ! true
       }
     case GetAll =>
-      cache.get[Set[ClassTag[Type]]](s"Type($typeName)") map {
+      cache get[Set[ClassTag[Type]]] s"Type($typeName)" map {
         case Some(s) => s
         case None => Set()
       } onComplete {
@@ -48,7 +48,7 @@ trait CacheBaseActor[Key, Type <: Sendable] extends Actor {
       }
   }
 
-  private def keyCode(keyName: Key) = {
+  protected def keyCode(keyName: Key) = {
     typeName + "(" + keyName + ")"
   }
 
