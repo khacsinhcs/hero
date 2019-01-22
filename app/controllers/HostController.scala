@@ -25,7 +25,7 @@ class HostController @Inject()(cc: ControllerComponents, cache: CacheAsyncApi, a
     ask(hostActor, Get(name)).mapTo[Host].map(host => Ok(Json.toJson(host)))
   }
 
-  def createHost = Action { request: Request[AnyContent] =>
+  def createHost: Action[AnyContent] = Action { request: Request[AnyContent] =>
     request.body.asJson map { json =>
       json.validate[Host] asOpt match {
         case Some(host) =>
