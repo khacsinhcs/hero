@@ -1,15 +1,18 @@
 package server
 
+import actors.HostActor
+import actors.events.CreateEvent
+import akka.actor.ActorSystem
 import com.google.inject.{Inject, Singleton}
-import play.api.cache.redis.CacheApi
+import model.HostConfig._
+import model.serverdto._
+import play.api.cache.redis.CacheAsyncApi
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import model.HostConfig._
-import model.serverdto._
 
 @Singleton
-class InitData @Inject()(cache: CacheApi)(implicit executionContext: ExecutionContext) {
+class InitData @Inject()(cache: CacheAsyncApi, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) {
 
   object Database {
     val hosts = List(Host("DEV", "", "", ""), Host("DEV2", "", "", ""))
@@ -17,10 +20,8 @@ class InitData @Inject()(cache: CacheApi)(implicit executionContext: ExecutionCo
   }
 
   def initData(): Unit = {
-    Database.hosts.map(host => ("Host#" + host.name, host)).foreach(host => {
-      cache.set(host._1, host._2, 10 minutes)
-      cache.append("hostKeys", host._1)
-    })
+    val actor = actorSystem.actorOf(HostActor.prop(executionContext, cache))
+    Database.hosts foreach(host => actor ! CreateEvent(host))
   }
 
   initData()

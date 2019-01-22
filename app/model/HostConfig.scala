@@ -1,7 +1,9 @@
 package model
 
+import actors.Sendable
+
 object HostConfig {
-  case class Host(name: String, gateway: String, web: String, mls: String) extends Serializable
+  case class Host(name: String, gateway: String, web: String, mls: String) extends Serializable with Sendable
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
