@@ -54,7 +54,7 @@ trait CacheBaseActor[Key, Type <: Sendable] extends Actor {
 
   val typeName: String
 
-  def keyOf(t: Type): Key
+  def keyOf: Type => Key
 }
 
 

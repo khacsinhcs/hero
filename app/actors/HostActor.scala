@@ -15,5 +15,5 @@ class HostActor @Inject()(val executionContext: ExecutionContext, val cache: Cac
 
   override val typeName: String = "Host"
 
-  override def keyOf(t: Host): String = t.name
+  override def keyOf: Host => String = (t: Host) => t.name
 }
