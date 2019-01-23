@@ -10,6 +10,7 @@ import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
+
 class HostController @Inject()(cc: ControllerComponents, cache: CacheApi, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
 
   import actors.events._
@@ -21,7 +22,7 @@ class HostController @Inject()(cc: ControllerComponents, cache: CacheApi, actorS
   val hostActor: ActorRef = actorSystem.actorOf(HostActor.prop(executionContext, cache))
 
   def getHost(name: String): Action[AnyContent] = Action.async {
-    ask(hostActor, Get(name)).mapTo[Option[Host]].map{
+    ask(hostActor, Get(name)).mapTo[Option[Host]].map {
       case Some(host) => Ok(Json.toJson(host))
       case None => NotFound
     }
@@ -47,6 +48,7 @@ class HostController @Inject()(cc: ControllerComponents, cache: CacheApi, actorS
   }
 
   def getAllHosts: Action[AnyContent] = Action.async { _: Request[AnyContent] =>
-    ask(hostActor, GetAll[Host]()).mapTo[Seq[Host]].map(hosts => Ok(Json.toJson(hosts)))
+    ask(hostActor, GetAll()).mapTo[List[Host]].map(hosts => Ok(Json.toJson(hosts))
+    )
   }
 }

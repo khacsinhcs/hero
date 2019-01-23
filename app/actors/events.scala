@@ -8,7 +8,7 @@ object events {
 
   case class DeleteEvent[Key](key: Key)
 
-  case class GetAll[Type <: Sendable]()
+  case class GetAll()
 
   case class Get[Key](key: Key)
 

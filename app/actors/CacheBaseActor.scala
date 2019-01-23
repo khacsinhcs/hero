@@ -12,19 +12,17 @@ abstract class CacheBaseActor[Key: ClassTag, Type <: Sendable : ClassTag] extend
 
   implicit val executionContext: ExecutionContext
 
-  import scala.concurrent.duration._
-
   override def receive: Receive = {
 
     case CreateEvent(t: Type) =>
       val keyName: Key = keyOf(t)
-      cache set(keyCode(keyName), t, 1000 minutes)
+      cache set(keyCode(keyName), t)
       cache set[String] s"Type($typeName)" add keyCode(keyName)
     case UpdateEvent(keyName: Key, data: Type) =>
       val oldValue = cache get[Type] keyCode(keyName)
       val isSuccess = oldValue match {
         case Some(_) =>
-          cache set(keyCode(keyName), data, 1000 minutes)
+          cache set (keyCode(keyName), data)
           true
         case None => false
       }
@@ -34,16 +32,14 @@ abstract class CacheBaseActor[Key: ClassTag, Type <: Sendable : ClassTag] extend
       cache.remove(keyCode(keyName))
       cache.set[String](s"Type($typeName)").remove(keyCode(keyName))
       sender ! success
-    case GetAll =>
-      sender ! (cache get[Set[Type]] s"Type($typeName)")
-
+    case GetAll() =>
+      val keys = cache.set[String](s"Type($typeName)").toSet
+      sender ! cache.getAll[Type](keys).filter(option => option.isDefined).map(data => data.get).toList
     case Get(keyName: Key) =>
       sender ! (cache get[Option[Type]] keyCode(keyName))
   }
 
-  protected def keyCode(keyName: Key): String = {
-    typeName + "(" + keyName + ")"
-  }
+  protected def keyCode(keyName: Key): String = s"$typeName($keyName)"
 
   val typeName: String
 
