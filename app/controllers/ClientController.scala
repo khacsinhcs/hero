@@ -3,13 +3,13 @@ package controllers
 import actors.ClientActor
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import controllers.com.alab.mvc.{AsyncCreateAction, Success, Fail}
+import com.alab.mvc.{AsyncCreateAction, Fail, Success}
 import javax.inject.Inject
 import play.api.cache.redis.CacheApi
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
 
@@ -29,7 +29,7 @@ class ClientController  @Inject()(cache: CacheApi, actorSystem: ActorSystem)(imp
     }
   }
 
-  def create: Action[AnyContent] = AsyncCreateAction[Client] as { client: Client =>
+  def create: Action[AnyContent] = new AsyncCreateAction[Client] as { client: Client =>
     (clientActor ? CreateEvent(client)).mapTo[Boolean] map (result => if (result) Success() else Fail("Save fail"))
   }
 

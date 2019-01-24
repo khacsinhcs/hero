@@ -1,13 +1,12 @@
-package controllers.com.alab.mvc
+package com.alab.mvc
 
-import play.api.libs.json.{Reads, Writes}
+import play.api.libs.json.{Reads, Writes, _}
 import play.api.mvc._
-import play.api.libs.json._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseAction {
-  val cc: ControllerComponents
+  implicit val cc: ControllerComponents
   protected implicit val ex: ExecutionContext = cc.executionContext
 
   def Action: ActionBuilder[Request, AnyContent] = cc.actionBuilder
@@ -15,8 +14,8 @@ trait BaseAction {
 }
 
 trait ReadWrite[In, Out] {
-  protected implicit val read: Reads[In]
-  protected implicit val write: Writes[Out]
+  implicit val read: Reads[In]
+  implicit val write: Writes[Out]
 }
 
 trait AsyncAction[In, Out] extends BaseAction with ReadWrite[In, Out] {
@@ -57,11 +56,11 @@ protected abstract class ParseJsonAction[Type](implicit val reader: Reads[Type],
 
 }
 
-case class CreateAction[Type](implicit override val reader: Reads[Type], override implicit val cc: ControllerComponents) extends ParseJsonAction[Type]
+class CreateAction[Type](implicit override val reader: Reads[Type], override implicit val cc: ControllerComponents) extends ParseJsonAction[Type]
 
-case class AsyncCreateAction[Type](implicit val write: Writes[String], implicit val read: Reads[Type], implicit val cc: ControllerComponents) extends AsyncAction[Type, String]
+class AsyncCreateAction[Type](implicit val write: Writes[String], implicit val read: Reads[Type], implicit val cc: ControllerComponents) extends AsyncAction[Type, String]
 
-case class AsyncUpdateAction[Type](implicit val write: Writes[String], implicit val read: Reads[Type], implicit val cc: ControllerComponents) extends AsyncAction[Type, String]
+class AsyncUpdateAction[Type](implicit val write: Writes[String], implicit val read: Reads[Type], implicit val cc: ControllerComponents) extends AsyncAction[Type, String]
 
 trait Done[Type]
 

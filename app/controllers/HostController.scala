@@ -3,13 +3,14 @@ package controllers
 import actors.HostActor
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
+import com.alab.mvc._
 import javax.inject.Inject
 import play.api.cache.redis.CacheApi
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 class HostController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implicit cc: ControllerComponents, implicit val executionContext: ExecutionContext) extends AbstractController(cc) {
 
@@ -28,11 +29,13 @@ class HostController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implic
     }
   }
 
-  def createHost: Action[AnyContent] = AsyncCreateAction[Host] as { host: Host =>
-    (hostActor ? CreateEvent(host)).mapTo[Boolean] map (result => if (result) Success() else Fail("Save fail"))
+  def createHost: Action[AnyContent] = McvHelper.simpleCreateAction[Host](hostActor) {
+    case Host(t,_,_,_) if t.isEmpty => Fail("Key Name is required")
+    case Host(_, x, y, z) if !x.startsWith("http") && !y.startsWith("http") && !z.startsWith("http")=> Fail("Wrong link")
+    case _ => Success()
   }
 
-  def updateHost(name: String): Action[AnyContent] = AsyncUpdateAction[Host] as { host =>
+  def updateHost(name: String): Action[AnyContent] = new AsyncUpdateAction[Host] as { host =>
     if (name != host.name)
       Future.successful(Fail(s"Can't change key"))
     else
