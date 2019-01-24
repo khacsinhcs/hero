@@ -8,10 +8,10 @@ import play.api.cache.redis.CacheApi
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
-class HostController @Inject()(cc: ControllerComponents, cache: CacheApi, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) extends AbstractController(cc) {
+class HostController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implicit cc: ControllerComponents, implicit val executionContext: ExecutionContext) extends AbstractController(cc) {
 
   import actors.events._
   import akka.pattern.ask
@@ -28,27 +28,23 @@ class HostController @Inject()(cc: ControllerComponents, cache: CacheApi, actorS
     }
   }
 
-  def createHost: Action[AnyContent] = Action { request: Request[AnyContent] =>
-    request.body.asJson map { json =>
-      json.validate[Host] asOpt match {
-        case Some(host) =>
-          hostActor ! CreateEvent(host)
-          Ok("")
-        case None => BadRequest
-      }
-    } getOrElse {
-      BadRequest("Expecting application/json request body")
-    }
+  def createHost: Action[AnyContent] = AsyncCreateAction[Host] as { host: Host =>
+    (hostActor ? CreateEvent(host)).mapTo[Boolean] map (result => if (result) Success() else Fail("Save fail"))
   }
 
-  def updateHost(name: String): Action[AnyContent] = Action { _: Request[AnyContent] => Ok("Todo") }
+  def updateHost(name: String): Action[AnyContent] = AsyncUpdateAction[Host] as { host =>
+    if (name != host.name)
+      Future.successful(Fail(s"Can't change key"))
+    else
+      (hostActor ? UpdateEvent(name, host)).mapTo[Boolean] map (result => if (result) Success() else Fail("Update fail"))
+  }
 
   def deleteHost(name: String): Action[AnyContent] = Action.async { _: Request[AnyContent] =>
-    ask(hostActor, DeleteEvent(name)).map(_ => Ok)
+    val isSuccess = hostActor ? DeleteEvent(name)
+    isSuccess.mapTo[Boolean] map (b => if (b) Ok("") else NotFound(""))
   }
 
   def getAllHosts: Action[AnyContent] = Action.async { _: Request[AnyContent] =>
-    ask(hostActor, GetAll()).mapTo[List[Host]].map(hosts => Ok(Json.toJson(hosts))
-    )
+    ask(hostActor, GetAll()).mapTo[List[Host]] map (hosts => Ok(Json.toJson(hosts)))
   }
 }

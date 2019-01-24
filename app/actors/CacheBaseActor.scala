@@ -15,9 +15,15 @@ abstract class CacheBaseActor[Key: ClassTag, Type <: Sendable : ClassTag] extend
   override def receive: Receive = {
 
     case CreateEvent(t: Type) =>
-      val keyName: Key = keyOf(t)
-      cache set(keyCode(keyName), t)
-      cache set[String] s"Type($typeName)" add keyCode(keyName)
+      try {
+        val keyName: Key = keyOf(t)
+        cache set(keyCode(keyName), t)
+        cache set[String] s"Type($typeName)" add keyCode(keyName)
+        sender ! true
+      } catch {
+        case _: Throwable => sender ! false
+      }
+
     case UpdateEvent(keyName: Key, data: Type) =>
       val oldValue = cache get[Type] keyCode(keyName)
       val isSuccess = oldValue match {
@@ -28,10 +34,14 @@ abstract class CacheBaseActor[Key: ClassTag, Type <: Sendable : ClassTag] extend
       }
       sender ! isSuccess
     case DeleteEvent(keyName: Key) =>
-      val success = cache get[Type] keyCode(keyName)
-      cache.remove(keyCode(keyName))
-      cache.set[String](s"Type($typeName)").remove(keyCode(keyName))
-      sender ! success
+      val existed = cache get[Type] keyCode(keyName)
+      existed match {
+        case Some(_) =>
+          cache.remove(keyCode(keyName))
+          cache.set[String](s"Type($typeName)").remove(keyCode(keyName))
+          sender ! true
+        case None => sender ! false
+      }
     case GetAll() =>
       val keys = cache.set[String](s"Type($typeName)").toSet
       sender ! cache.getAll[Type](keys).filter(option => option.isDefined).map(data => data.get).toList

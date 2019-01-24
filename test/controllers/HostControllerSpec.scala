@@ -79,5 +79,11 @@ class HostControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
       val getResponse = route(app, getRequest).get
       status(getResponse) mustBe NOT_FOUND
     }
+
+    "Delete random" in {
+      val deleteRequest = FakeRequest(DELETE, "/api/host/WRONG")
+      val deleteResponse = route(app, deleteRequest).get
+      status(deleteResponse) mustBe NOT_FOUND
+    }
   }
 }

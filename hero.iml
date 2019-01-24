@@ -19,6 +19,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/target/streams" />
+      <excludeFolder url="file://$MODULE_DIR$/target/web" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -131,7 +132,7 @@
     <orderEntry type="library" scope="TEST" name="sbt: com.google.code.gson:gson:2.8.0:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="sbt: com.google.code.findbugs:jsr305:3.0.2:jar" level="project" />
     <orderEntry type="library" name="sbt: com.google.code.findbugs:jsr305:1.3.9:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.github.karelcemus:play-redis_2.12:2.3.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.karelcemus:play-redis_2.12:3.3.3:jar" level="project" />
     <orderEntry type="library" name="sbt: com.github.Ma27:rediscala_2.12:1.8.4:jar" level="project" />
     <orderEntry type="library" name="sbt: com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.11:jar" level="project" />
     <orderEntry type="library" name="sbt: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.11:jar" level="project" />
