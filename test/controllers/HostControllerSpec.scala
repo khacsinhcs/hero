@@ -33,9 +33,9 @@ class HostControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
     "success" in {
       val json: JsValue = JsObject(Seq(
         "name" -> JsString("hello"),
-        "gateway" -> JsString("gateway"),
-        "mls" -> JsString("mls"),
-        "web" -> JsString("web")
+        "gateway" -> JsString("http://gateway"),
+        "mls" -> JsString("http://mls"),
+        "web" -> JsString("http://web")
       ))
 
       val request = FakeRequest(POST, "/api/host").withJsonBody(json)
@@ -57,10 +57,10 @@ class HostControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
 
     "Accept redundant value" in {
       val json: JsValue = JsObject(Seq(
-        "name" -> JsString("hello"),
-        "gateway" -> JsString("gateway"),
-        "mls" -> JsString("mls"),
-        "web" -> JsString("web"),
+        "name" -> JsString("http://hello"),
+        "gateway" -> JsString("http://gateway"),
+        "mls" -> JsString("http://mls"),
+        "web" -> JsString("http://web"),
         "something" -> JsString("Some thing weird")
       ))
       val request = FakeRequest(POST, "/api/host").withJsonBody(json)
