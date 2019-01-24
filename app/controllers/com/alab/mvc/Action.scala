@@ -1,4 +1,4 @@
-package controllers
+package controllers.com.alab.mvc
 
 import play.api.libs.json.{Reads, Writes}
 import play.api.mvc._
@@ -18,8 +18,6 @@ trait ReadWrite[In, Out] {
   protected implicit val read: Reads[In]
   protected implicit val write: Writes[Out]
 }
-
-
 
 trait AsyncAction[In, Out] extends BaseAction with ReadWrite[In, Out] {
 
