@@ -1,9 +1,9 @@
 package model
 
-import com.alab.mvc.Sendable
+import com.alab.mvc.Data
 
 object CustomerConfig {
-  case class Client(shortName: String, apiKey: String) extends Sendable
+  case class Client(shortName: String, apiKey: String) extends Data
 
 
   import play.api.libs.functional.syntax._

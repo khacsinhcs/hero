@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object MvcHelper {
 
-  def validateThenCreate[Type <: Sendable](createActor: ActorRef)(validate: Type => Done[String])(implicit timeHost: Timeout, write: Writes[String], read: Reads[Type], cc: ControllerComponents, ex: ExecutionContext) =
+  def validateThenCreate[Type <: Data](createActor: ActorRef)(validate: Type => Done[String])(implicit timeHost: Timeout, write: Writes[String], read: Reads[Type], cc: ControllerComponents, ex: ExecutionContext) =
     new AsyncCreateAction[Type] as { candidate: Type =>
       validate(candidate) match {
         case Success() => (createActor ? CreateEvent[Type](candidate)).mapTo[Boolean] map (result => if (result) Success() else Fail("Save fail"))
@@ -19,7 +19,7 @@ object MvcHelper {
       }
     }
 
-  def simpleCreate[Type <: Sendable](createActor: ActorRef)(implicit timeHost: Timeout, write: Writes[String], read: Reads[Type], cc: ControllerComponents, ex: ExecutionContext) =
+  def simpleCreate[Type <: Data](createActor: ActorRef)(implicit timeHost: Timeout, write: Writes[String], read: Reads[Type], cc: ControllerComponents, ex: ExecutionContext) =
     validateThenCreate[Type](createActor) { _ => Success() }(timeHost, write, read, cc, ex)
 
 }

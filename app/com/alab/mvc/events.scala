@@ -2,9 +2,9 @@ package com.alab.mvc
 
 object events {
 
-  case class CreateEvent[Type <: Sendable](t: Type)
+  case class CreateEvent[Type <: Data](t: Type)
 
-  case class UpdateEvent[Key, Type <: Sendable](key: Key, t: Type)
+  case class UpdateEvent[Key, Type <: Data](key: Key, t: Type)
 
   case class DeleteEvent[Key](key: Key)
 
@@ -14,4 +14,4 @@ object events {
 
 }
 
-trait Sendable
+trait Data

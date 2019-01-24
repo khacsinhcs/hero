@@ -1,9 +1,9 @@
 package model
 
-import com.alab.mvc.Sendable
+import com.alab.mvc.Data
 
 object HostConfig {
-  case class Host(name: String, gateway: String, web: String, mls: String) extends Serializable with Sendable
+  case class Host(name: String, gateway: String, web: String, mls: String) extends Serializable with Data
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._

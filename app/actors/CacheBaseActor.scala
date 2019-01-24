@@ -2,13 +2,13 @@ package actors
 
 import com.alab.mvc.events._
 import akka.actor.Actor
-import com.alab.mvc.Sendable
+import com.alab.mvc.Data
 import play.api.cache.redis.CacheApi
 
 import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
 
-abstract class CacheBaseActor[Key: ClassTag, Type <: Sendable : ClassTag] extends Actor {
+abstract class CacheBaseActor[Key: ClassTag, Type <: Data : ClassTag] extends Actor {
   val cache: CacheApi
 
   implicit val executionContext: ExecutionContext
