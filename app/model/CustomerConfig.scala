@@ -1,6 +1,6 @@
 package model
 
-import actors.Sendable
+import com.alab.mvc.Sendable
 
 object CustomerConfig {
   case class Client(shortName: String, apiKey: String) extends Sendable

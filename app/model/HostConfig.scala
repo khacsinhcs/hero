@@ -1,6 +1,6 @@
 package model
 
-import actors.Sendable
+import com.alab.mvc.Sendable
 
 object HostConfig {
   case class Host(name: String, gateway: String, web: String, mls: String) extends Serializable with Sendable

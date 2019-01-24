@@ -1,7 +1,7 @@
 package server
 
 import actors.{ClientActor, HostActor}
-import actors.events.CreateEvent
+import com.alab.mvc.events.CreateEvent
 import akka.actor.ActorSystem
 import com.google.inject.{Inject, Singleton}
 import model.CustomerConfig.Client

@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class HostController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implicit cc: ControllerComponents, implicit val executionContext: ExecutionContext) extends AbstractController(cc) {
 
-  import actors.events._
+  import events._
   import akka.pattern.ask
   import model.HostConfig._
 
@@ -29,7 +29,7 @@ class HostController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implic
     }
   }
 
-  def createHost: Action[AnyContent] = McvHelper.simpleCreateAction[Host](hostActor) {
+  def createHost: Action[AnyContent] = MvcHelper.validateThenCreate[Host](hostActor) {
     case Host(t,_,_,_) if t.isEmpty => Fail("Key Name is required")
     case Host(_, x, y, z) if !x.startsWith("http") && !y.startsWith("http") && !z.startsWith("http")=> Fail("Wrong link")
     case _ => Success()

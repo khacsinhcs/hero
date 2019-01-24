@@ -1,7 +1,8 @@
 package actors
 
-import actors.events._
+import com.alab.mvc.events._
 import akka.actor.Actor
+import com.alab.mvc.Sendable
 import play.api.cache.redis.CacheApi
 
 import scala.concurrent.ExecutionContext

@@ -3,7 +3,7 @@ package controllers
 import actors.ClientActor
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import com.alab.mvc.{AsyncCreateAction, Fail, Success}
+import com.alab.mvc.{AsyncCreateAction, Fail, MvcHelper, Success}
 import javax.inject.Inject
 import play.api.cache.redis.CacheApi
 import play.api.libs.json.Json
@@ -15,7 +15,7 @@ import scala.concurrent.duration._
 
 class ClientController  @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implicit cc: ControllerComponents, implicit val executionContext: ExecutionContext) extends AbstractController(cc) {
 
-  import actors.events._
+  import com.alab.mvc.events._
   import akka.pattern.ask
   import model.CustomerConfig._
   implicit val timeout: Timeout = Timeout(5 seconds)
@@ -29,8 +29,6 @@ class ClientController  @Inject()(cache: CacheApi, actorSystem: ActorSystem)(imp
     }
   }
 
-  def create: Action[AnyContent] = new AsyncCreateAction[Client] as { client: Client =>
-    (clientActor ? CreateEvent(client)).mapTo[Boolean] map (result => if (result) Success() else Fail("Save fail"))
-  }
+  def create: Action[AnyContent] = MvcHelper simpleCreate[Client] clientActor
 
 }

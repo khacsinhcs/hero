@@ -1,4 +1,4 @@
-package actors
+package com.alab.mvc
 
 object events {
 
