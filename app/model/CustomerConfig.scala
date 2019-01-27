@@ -13,7 +13,6 @@ object CustomerConfig {
     "shortName" -> host.shortName,
     "apiKey" -> host.apiKey
   )
-
   implicit val customerRead: Reads[Client] = (
     (JsPath \ "shortName").read[String] and
       (JsPath \ "apiKey").read[String]
