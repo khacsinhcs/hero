@@ -4,6 +4,7 @@ import actors.HostActor
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.alab.mvc._
+import com.alab.mvc.actionHelper._
 import javax.inject.Inject
 import play.api.cache.redis.CacheApi
 import play.api.libs.json._
@@ -12,10 +13,10 @@ import play.api.mvc._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-class HostController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implicit cc: ControllerComponents, implicit val executionContext: ExecutionContext) extends AbstractController(cc) {
+class HostController @Inject()(cache: CacheApi, actorSystem: ActorSystem, asJson: AsJson)(implicit cc: ControllerComponents, executionContext: ExecutionContext) extends AbstractController(cc) {
 
-  import events._
   import akka.pattern.ask
+  import events._
   import model.HostConfig._
 
   implicit val timeout: Timeout = Timeout(5 seconds)
@@ -29,12 +30,15 @@ class HostController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implic
     }
   }
 
-  def createHost: Action[AnyContent] = MvcHelper.validateThenCreate[Host](hostActor) {
+  def createHost: Action[AnyContent] =   MvcHelper.validateThenCreate[Host](hostActor) {
     case Host(t,_,_,_) if t.isEmpty => Fail("Key Name is required")
     case Host(_, x, y, z) if !x.startsWith("http") && !y.startsWith("http") && !z.startsWith("http")=> Fail("Wrong link")
     case _ => Success()
   }
 
+  def test = (asJson andThen asJson andThen asJson) {x =>
+    Ok("")
+  }
   def updateHost(name: String): Action[AnyContent] = new AsyncUpdateAction[Host] as { host =>
     if (name != host.name)
       Future.successful(Fail(s"Can't change key"))

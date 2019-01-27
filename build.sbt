@@ -12,6 +12,8 @@ libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
 libraryDependencies += play.sbt.PlayImport.cacheApi
 libraryDependencies += "com.github.karelcemus" %% "play-redis" % "3.3.3"
+libraryDependencies += "com.alab" %% "mvc" % "1.0"
+
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.alab.controllers._"
 
