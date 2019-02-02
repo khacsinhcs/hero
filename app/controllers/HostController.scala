@@ -30,15 +30,16 @@ class HostController @Inject()(cache: CacheApi, actorSystem: ActorSystem, asJson
     }
   }
 
-  def createHost: Action[AnyContent] =   MvcHelper.validateThenCreate[Host](hostActor) {
-    case Host(t,_,_,_) if t.isEmpty => Fail("Key Name is required")
-    case Host(_, x, y, z) if !x.startsWith("http") && !y.startsWith("http") && !z.startsWith("http")=> Fail("Wrong link")
+  def createHost: Action[AnyContent] = MvcHelper.validateThenCreate[Host](hostActor) {
+    case Host(t, _, _, _) if t.isEmpty => Fail("Key Name is required")
+    case Host(_, x, y, z) if !x.startsWith("http") && !y.startsWith("http") && !z.startsWith("http") => Fail("Wrong link")
     case _ => Success()
   }
 
-  def test = (asJson andThen asJson andThen asJson) {x =>
+  def test = (asJson andThen asJson andThen asJson) { x =>
     Ok("")
   }
+
   def updateHost(name: String): Action[AnyContent] = new AsyncUpdateAction[Host] as { host =>
     if (name != host.name)
       Future.successful(Fail(s"Can't change key"))
