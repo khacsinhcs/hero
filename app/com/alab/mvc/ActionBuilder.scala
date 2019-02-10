@@ -1,8 +1,7 @@
 package com.alab.mvc
 
-import com.alab.mvc.request.{HasCaseClass, RequestAsJson}
+import com.alab.mvc.request.RequestAsJson
 import javax.inject.Inject
-import play.api.libs.json.Reads
 import play.api.mvc.{AnyContent, _}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,11 +17,6 @@ object actionHelper {
         }
       }
     }
-  }
-
-  case class ToCaseClass[DataType](implicit val executionContext: ExecutionContext, val read: Reads[DataType])
-    extends ActionBuilder[HasCaseClass, RequestAsJson] with ActionTransformer[RequestAsJson, HasCaseClass] {
-    override protected def transform[A](request: RequestAsJson[A]): Future[HasCaseClass[A]] = ???
   }
 
 }
