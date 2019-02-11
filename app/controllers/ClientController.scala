@@ -3,11 +3,13 @@ package controllers
 import actors.ClientActor
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
+import com.alab.MappableHelper
+import com.alab.model.MapValues
 import com.alab.mvc.action.BodyAsJson
+import com.alab.mvc.data.Convert
 import javax.inject.Inject
 import model.config._
 import play.api.cache.redis.CacheApi
-import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
@@ -27,7 +29,9 @@ class ClientController @Inject()(cache: CacheApi, actorSystem: ActorSystem, body
 
   def get(name: String): Action[AnyContent] = Action.async {
     (clientActor ? Get(name)).mapTo[Option[Client]] map {
-      case Some(client) => Ok(Json.toJson(client))
+      case Some(c) =>
+        val client = MappableHelper.mapify[Client](c)
+        Ok(Convert.toJson(MapValues(client), ClientConf))
       case None => NotFound
     }
   }

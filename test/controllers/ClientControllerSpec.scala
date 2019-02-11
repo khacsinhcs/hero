@@ -18,6 +18,24 @@ class ClientControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecti
       val response = route(app, request).get
       status(response) mustBe OK
     }
+
+    "save with wrong value" in {
+      val json: JsValue = JsObject(Seq(
+        "short_name" -> JsString("sinhle"),
+        "apikey" -> JsString("whatthefuck")
+      ))
+
+      val request = FakeRequest(POST, "/api/client").withJsonBody(json)
+      val response = route(app, request).get
+      status(response) mustNot be(OK)
+    }
   }
 
+  "GET client" should {
+    "correct name" in {
+      val request = FakeRequest(GET, "/api/client/securityfeature")
+      val response = route(app, request).get
+      status(response) mustBe OK
+    }
+  }
 }
