@@ -3,21 +3,23 @@ package controllers
 import actors.ClientActor
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import com.alab.mvc.{AsyncCreateAction, Fail, MvcHelper, Success}
+import com.alab.mvc.action.BodyAsJson
 import javax.inject.Inject
 import play.api.cache.redis.CacheApi
 import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
+class ClientController @Inject()(cache: CacheApi, actorSystem: ActorSystem, bodyAsJson: BodyAsJson)(implicit cc: ControllerComponents, executionContext: ExecutionContext, bodyParsers: BodyParsers.Default)
+  extends AbstractController(cc) {
 
-class ClientController  @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implicit cc: ControllerComponents, implicit val executionContext: ExecutionContext) extends AbstractController(cc) {
-
-  import com.alab.mvc.events._
   import akka.pattern.ask
+  import com.alab.mvc.action._
+  import com.alab.mvc.events._
   import model.CustomerConfig._
+
   implicit val timeout: Timeout = Timeout(5 seconds)
 
   val clientActor: ActorRef = actorSystem.actorOf(ClientActor.prop(executionContext, cache))
@@ -29,6 +31,9 @@ class ClientController  @Inject()(cache: CacheApi, actorSystem: ActorSystem)(imp
     }
   }
 
-  def create: Action[AnyContent] = MvcHelper simpleCreate[Client] clientActor
+  def create: Action[AnyContent] = bodyAsJson { r: RequestAsJson[_] =>
+    r.json.is("Client")
+    Ok("")
+  }
 
 }
