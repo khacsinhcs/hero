@@ -2,7 +2,7 @@ package model
 
 import com.alab.mvc.Data
 
-object HostConfig {
+package object HostConfig {
   case class Host(name: String, gateway: String, web: String, mls: String) extends Serializable with Data
 
   import play.api.libs.functional.syntax._

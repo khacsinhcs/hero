@@ -2,7 +2,7 @@ package model
 
 import com.alab.mvc.Data
 
-object CustomerConfig {
+package object CustomerConfig {
   case class Client(shortName: String, apiKey: String) extends Data
 
 

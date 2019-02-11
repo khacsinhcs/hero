@@ -5,6 +5,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.alab.mvc.action.BodyAsJson
 import javax.inject.Inject
+import model.config._
 import play.api.cache.redis.CacheApi
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -32,7 +33,9 @@ class ClientController @Inject()(cache: CacheApi, actorSystem: ActorSystem, body
   }
 
   def create: Action[AnyContent] = bodyAsJson { r: RequestAsJson[_] =>
-    r.json.is("Client")
+    val values = r.json
+    val client = values.materialize[Client](ClientConf)
+    clientActor ? CreateEvent(client)
     Ok("")
   }
 
