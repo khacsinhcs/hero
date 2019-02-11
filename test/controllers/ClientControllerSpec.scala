@@ -32,10 +32,16 @@ class ClientControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecti
   }
 
   "GET client" should {
-    "correct name" in {
+    "with correct keyName" in {
       val request = FakeRequest(GET, "/api/client/securityfeature")
       val response = route(app, request).get
       status(response) mustBe OK
+    }
+
+    "with wrong keyName" in {
+      val request = FakeRequest(GET, "/api/client/notfound")
+      val response = route(app, request).get
+      status(response) mustBe NOT_FOUND
     }
   }
 }
