@@ -22,7 +22,7 @@ class ClientController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(impl
   import akka.pattern.ask
   import com.alab.mvc.action._
   import com.alab.mvc.events._
-  import model.CustomerConfig._
+  import model._
 
   implicit val timeout: Timeout = Timeout(5 seconds)
   implicit val kind: Type = ClientConf

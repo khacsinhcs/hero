@@ -2,7 +2,7 @@ package actors
 
 import akka.actor.Props
 import javax.inject.Inject
-import model.CustomerConfig.Client
+import model._
 import play.api.cache.redis.CacheApi
 
 import scala.concurrent.ExecutionContext

@@ -1,11 +1,11 @@
 package server
 
 import actors.{ClientActor, HostActor}
-import com.alab.mvc.events.CreateEvent
 import akka.actor.ActorSystem
+import com.alab.mvc.events.CreateEvent
 import com.google.inject.{Inject, Singleton}
-import model.CustomerConfig.Client
 import model.HostConfig._
+import model._
 import play.api.cache.redis.CacheApi
 
 import scala.concurrent.ExecutionContext
