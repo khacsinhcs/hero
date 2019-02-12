@@ -4,8 +4,9 @@ import actors.ClientActor
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.alab.MappableHelper
+import com.alab.conf.Type
 import com.alab.model.MapValues
-import com.alab.mvc.action.BodyAsJson
+import com.alab.mvc.action._
 import com.alab.mvc.data.Convert
 import javax.inject.Inject
 import model.config._
@@ -15,8 +16,8 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
-class ClientController @Inject()(cache: CacheApi, actorSystem: ActorSystem, bodyAsJson: BodyAsJson)(implicit cc: ControllerComponents, executionContext: ExecutionContext, bodyParsers: BodyParsers.Default)
-  extends AbstractController(cc) {
+class ClientController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implicit cc: ControllerComponents, executionContext: ExecutionContext, bodyParsers: BodyParsers.Default)
+  extends AbstractController(cc) with HasValueReader with RequestValidator {
 
   import akka.pattern.ask
   import com.alab.mvc.action._
@@ -24,6 +25,7 @@ class ClientController @Inject()(cache: CacheApi, actorSystem: ActorSystem, body
   import model.CustomerConfig._
 
   implicit val timeout: Timeout = Timeout(5 seconds)
+  implicit val kind: Type = ClientConf
 
   val clientActor: ActorRef = actorSystem.actorOf(ClientActor.prop(executionContext, cache))
 
@@ -36,9 +38,8 @@ class ClientController @Inject()(cache: CacheApi, actorSystem: ActorSystem, body
     }
   }
 
-  def create: Action[AnyContent] = bodyAsJson { r: RequestAsJson[_] =>
-    val values = r.json
-    val client = values.materialize[Client](ClientConf)
+  def create: Action[AnyContent] = (BodyAsHasValue andThen Validate) { request: RequestAsHasValue[_] =>
+    val client = request.hasValues.materialize[Client](ClientConf)
     clientActor ? CreateEvent(client)
     Ok("")
   }
