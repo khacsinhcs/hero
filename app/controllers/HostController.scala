@@ -17,8 +17,9 @@ class HostController @Inject()(cache: CacheApi, actorSystem: ActorSystem, asJson
 
   import akka.pattern.ask
   import events._
-  import model.HostConfig._
+  import model._
 
+  implicit val format: OFormat[Host] = Json.format[Host]
   implicit val timeout: Timeout = Timeout(5 seconds)
 
   val hostActor: ActorRef = actorSystem.actorOf(HostActor.prop(executionContext, cache))
