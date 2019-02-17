@@ -15,7 +15,7 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
-class ClientController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implicit cc: ControllerComponents, executionContext: ExecutionContext, bodyParsers: BodyParsers.Default)
+class ClientController @Inject()(cache: CacheApi, actorSystem: ActorSystem)(implicit cc: ControllerComponents, implicit val executionContext: ExecutionContext, implicit val bodyParsers: BodyParsers.Default)
   extends AbstractController(cc) with HasValueReader with RequestValidator {
 
   import akka.pattern.ask
