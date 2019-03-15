@@ -4,7 +4,6 @@ import actors.{ClientActor, HostActor}
 import akka.actor.ActorSystem
 import com.alab.mvc.events.CreateEvent
 import com.google.inject.{Inject, Singleton}
-import model.HostConfig._
 import model._
 import play.api.cache.redis.CacheApi
 
